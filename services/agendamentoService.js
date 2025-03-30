@@ -28,6 +28,7 @@ const criar = async (dados) => {
       servico,
       data: new Date(data),
       hora: dataHora,
+      status: 'pendente', // Define status inicial
     },
   });
 };
@@ -84,8 +85,12 @@ const verificarDisponibilidade = async (dataStr) => {
         gte: abertura,
         lt: fechamento,
       },
-      NOT: {
-        status: 'cancelado'
+      hora: {
+        gte: abertura,
+        lt: fechamento,
+      },
+      status: {
+        notIn: ['cancelado']
       }
     },
   });
