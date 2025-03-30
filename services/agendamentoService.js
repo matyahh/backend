@@ -84,9 +84,6 @@ const verificarDisponibilidade = async (dataStr) => {
         gte: abertura,
         lt: fechamento,
       },
-      status: {
-        in: ['pendente', 'confirmado']
-      }
     },
   });
 
