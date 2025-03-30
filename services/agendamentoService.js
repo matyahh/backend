@@ -13,6 +13,9 @@ const criar = async (dados) => {
   const conflito = await prisma.agendamento.findFirst({
     where: {
       hora: dataHora,
+      status: {
+        notIn: ['cancelado']
+      }
     },
   });
 
