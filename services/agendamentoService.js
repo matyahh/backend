@@ -8,6 +8,7 @@ const criar = async (dados) => {
     throw new Error('Campos obrigatórios ausentes');
 
   const dataHora = new Date(hora); // hora é a data+hora completa
+  const dataAgendamento = new Date(data + 'T00:00:00-03:00'); // Garante que a data está no timezone correto
 
   // 🔒 Verificar conflito
   const conflito = await prisma.agendamento.findFirst({
@@ -29,7 +30,7 @@ const criar = async (dados) => {
       email,
       telefone,
       servico,
-      data: new Date(data),
+      data: dataAgendamento,
       hora: dataHora,
       status: 'pendente', // Define status inicial
     },
