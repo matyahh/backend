@@ -65,14 +65,15 @@ const gerarHorarios = (inicio, fim, intervaloMinutos) => {
 const verificarDisponibilidade = async (dataStr) => {
   if (!dataStr) throw new Error('Data não informada');
 
-  const data = new Date(dataStr + 'T00:00:00-03:00'); // Especifica o timezone
-
-  // Base de horários da barbearia
+  // Cria a data com o timezone correto
+  const data = new Date(dataStr);
+  
+  // Base de horários da barbearia - usando UTC
   const abertura = new Date(data);
-  abertura.setHours(8, 0, 0, 0);
+  abertura.setUTCHours(11, 0, 0, 0); // 8h BRT = 11h UTC
 
   const fechamento = new Date(data);
-  fechamento.setHours(18, 0, 0, 0);
+  fechamento.setUTCHours(21, 0, 0, 0); // 18h BRT = 21h UTC
 
   // Horários de 60 em 60 minutos
   const todosHorarios = gerarHorarios(abertura, fechamento, 60);
@@ -88,11 +89,9 @@ const verificarDisponibilidade = async (dataStr) => {
 
   const horariosOcupados = agendamentos.map((a) => a.hora.toISOString());
 
-  const horariosDisponiveis = todosHorarios.map(horario => {
-    // Ajusta o horário para considerar o timezone
-    const adjustedDate = new Date(horario.getTime() - (3 * 60 * 60 * 1000)); // -3 horas
-    return adjustedDate;
-  }).filter(h => !horariosOcupados.includes(h.toISOString()));
+  const horariosDisponiveis = todosHorarios.filter(
+    (h) => !horariosOcupados.includes(h.toISOString())
+  );
 
   return horariosDisponiveis;
 };
