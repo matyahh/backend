@@ -65,7 +65,7 @@ const gerarHorarios = (inicio, fim, intervaloMinutos) => {
 const verificarDisponibilidade = async (dataStr) => {
   if (!dataStr) throw new Error('Data não informada');
 
-  const data = new Date(dataStr + 'T00:00:00');
+  const data = new Date(dataStr + 'T00:00:00-03:00'); // Especifica o timezone
 
   // Base de horários da barbearia
   const abertura = new Date(data);
@@ -74,7 +74,7 @@ const verificarDisponibilidade = async (dataStr) => {
   const fechamento = new Date(data);
   fechamento.setHours(18, 0, 0, 0);
 
-  // Horários de 30 em 30 minutos
+  // Horários de 60 em 60 minutos
   const todosHorarios = gerarHorarios(abertura, fechamento, 60);
 
   const agendamentos = await prisma.agendamento.findMany({
@@ -88,9 +88,11 @@ const verificarDisponibilidade = async (dataStr) => {
 
   const horariosOcupados = agendamentos.map((a) => a.hora.toISOString());
 
-  const horariosDisponiveis = todosHorarios.filter(
-    (h) => !horariosOcupados.includes(h.toISOString())
-  );
+  const horariosDisponiveis = todosHorarios.map(horario => {
+    // Ajusta o horário para considerar o timezone
+    const adjustedDate = new Date(horario.getTime() - (3 * 60 * 60 * 1000)); // -3 horas
+    return adjustedDate;
+  }).filter(h => !horariosOcupados.includes(h.toISOString()));
 
   return horariosDisponiveis;
 };
