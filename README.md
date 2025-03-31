@@ -24,13 +24,61 @@ Back-end desenvolvido para o sistema de barbearia
 git clone [https://github.com/Carlos-bub/backend.git]
 cd backend
 npm install
-cp .env.example .env
+npm run dev
+cp .env
 ```
-### 3. Váriaveis de Ambiente(`/.envi`)
+### 2.3 Configuração do Prisma ORM
+```bash
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "SEU_BANCO"
+  url      = env("DATABASE_URL")
+}
+
+model Agendamento {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String
+  telefone  String
+  servico   String
+  data      DateTime
+  hora      DateTime
+  status    String   @default("Pendente")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Usuario {
+  id       Int     @id @default(autoincrement())
+  nome     String
+  email    String  @unique
+  senha    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Servico {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  codigo    String   @unique
+  preco     Float
+  duracao   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+### 3. Váriaveis de Ambiente(`/.env`)
 ```ini
-DATABASE_URL="postgresql: //USER:SENHA@localhost:5432/nome_do_banco"
-JWT_SECRET="sua_chave_secreta_aqui"
-PORT=3001
+DATABASE_URL="SEU_BANCO_DE_DADOS" #URL de conexão MySQL
+PORT=8080 #Porta de servidor
+JWT_SECRET="SUA_CHAVE" # Chave secreta para JWT
+EMAIL_HOST= # Host SMTP
+EMAIL_PORT=587 # Porta SMTP
+EMAIL_USER= # Email do remetente
+EMAIL_PASSWORD= # Senha de app do email
 ```
 ### 4. Migrações do Banco de Dados
 ```bash
@@ -64,18 +112,92 @@ prisma/
 ```
 ### 🔗 Rotas Principais
 
-#### Autenticação
-|Método                        |Rota       |Descrição               |
-|-----------------------|---------------------|----------------------|
-|POST               |/api/auth/login      | Login(retorna JWT)       |
-|POST               |/api/auth/sigup      | Cadastro de Administrador| 
+## 🌐 *Base URL:*  
+`https://backend-production-9519.up.railway.app`
+
+## 🔐 *Autenticação*  
+- As *rotas públicas* não exigem autenticação.
+- As *rotas protegidas* requerem um *token JWT* no header:  
+  `Authorization: Bearer <token>`
+- O token é obtido após um login bem-sucedido.
+
+## 📄 *Formato das Respostas:* JSON
+
 ---
-### Agendamentos
-|Método            |Rota                 |Descrição                |
-|------------------|---------------------|-------------------------|
-|GET               |/api/scheduling      | Lista todos Agendamentos|
-|POST              |/api/scheduling      | Criar novo Agendamento  |
-|DELETE            |/api/scheduling/:id  | Cancelar Agendamento    |
+
+## 🚀 *Rotas da API*
+
+### 📌 *Rotas Públicas*
+
+#### 🔹 *Agendamentos*
+
+POST /agendamentos
+
+> Cria um novo agendamento
+
+
+GET /agendamentos/disponibilidade
+
+> Verifica horários disponíveis para uma data
+
+#### 🔹 *Autenticação*
+
+POST /auth/login
+
+> Realiza login do usuário
+
+
+POST /auth/register
+
+> Registra um novo usuário (admin)
+
+#### 🔹 *Serviços*
+
+GET /servicos
+
+> Lista todos os serviços disponíveis
+
+---
+
+### 🔒 *Rotas Protegidas (Requer Token JWT)*
+
+#### 🔹 *Agendamentos*
+
+GET /agendamentos
+
+> Lista todos os agendamentos
+
+
+PUT /agendamentos/:id/status
+
+> Atualiza o status de um agendamento
+
+
+DELETE /agendamentos/:id
+
+> Remove um agendamento específico
+
+#### 🔹 *Serviços*
+
+POST /servicos
+
+> Cria um novo serviço
+
+
+PUT /servicos/:id
+
+> Atualiza um serviço existente
+
+
+DELETE /servicos/:id
+
+> Remove um serviço
+
+---
+
+## ⚠ *Observações*
+- Todas as respostas são no formato *JSON*.
+- Em caso de erro, a resposta incluirá uma mensagem descritiva.
 ---
 ### 🛡️ Segurança
 - Bcrypt: Hash de senhas antes de Salvar no Banco
@@ -99,4 +221,4 @@ prisma/
 |--------------|-------------------------|
 |nodemon       | Reinicio Automatico     |
 ## Licença
-ISC License - Veja LICENSE para detalhes.
+ISC License -
