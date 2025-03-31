@@ -121,8 +121,6 @@ prisma/
   `Authorization: Bearer <token>`
 - O token é obtido após um login bem-sucedido.
 
-## 📄 *Formato das Respostas:* JSON
-
 ---
 
 ## 🚀 *Rotas da API*
